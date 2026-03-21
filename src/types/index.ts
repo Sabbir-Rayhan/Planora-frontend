@@ -26,7 +26,7 @@ export interface IEvent {
   };
   _count?: {
     participations: number;
-    reviews: number;
+    reviews: true;
   };
 }
 
@@ -44,7 +44,7 @@ export interface IReview {
   comment: string;
   userId: string;
   eventId: string;
-  user?: { id: string; name: string };
+  user?: { id: true; name: string };
 }
 
 export interface IApiResponse<T> {
