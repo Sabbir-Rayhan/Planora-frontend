@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useAuthStore } from '@/store/authStore';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import axiosInstance from '@/lib/axios';
+import Link from "next/link";
+import { useAuthStore } from "@/store/authStore";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import axiosInstance from "@/lib/axios";
 
 export default function Navbar() {
   const { user, isAuthenticated, clearAuth } = useAuthStore();
@@ -13,13 +13,13 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post('/auth/logout');
+      await axiosInstance.post("/auth/logout");
       clearAuth();
-      toast.success('Logged out successfully');
-      router.push('/');
+      toast.success("Logged out successfully");
+      router.push("/");
     } catch {
       clearAuth();
-      router.push('/');
+      router.push("/");
     }
   };
 
@@ -40,12 +40,16 @@ export default function Navbar() {
             Events
           </Link>
           {isAuthenticated && (
-            <Link
-              href={user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/user'}
-              className="text-slate-600 hover:text-slate-900"
-            >
-              Dashboard
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/profile">
+                <span className="text-sm text-slate-600 hover:text-slate-900 cursor-pointer">
+                  Hi, {user?.name}
+                </span>
+              </Link>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
           )}
         </div>
 
@@ -53,9 +57,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-600">
-                Hi, {user?.name}
-              </span>
+              <span className="text-sm text-slate-600">Hi, {user?.name}</span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 Logout
               </Button>
