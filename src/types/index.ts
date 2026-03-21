@@ -4,6 +4,7 @@ export interface IUser {
   email: string;
   role: 'ADMIN' | 'USER';
   status: 'ACTIVE' | 'BLOCKED';
+  createdAt: string;
 }
 
 export interface IEvent {
@@ -44,7 +45,8 @@ export interface IReview {
   comment: string;
   userId: string;
   eventId: string;
-  user?: { id: true; name: string };
+  user?: { id: string; name: string };
+  event?: { id: string; title: string };
 }
 
 export interface IApiResponse<T> {
@@ -52,3 +54,4 @@ export interface IApiResponse<T> {
   message: string;
   data: T;
 }
+

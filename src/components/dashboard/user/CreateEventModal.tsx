@@ -1,0 +1,149 @@
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import axiosInstance from '@/lib/axios';
+import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+const eventSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  date: z.string().min(1, 'Date is required'),
+  time: z.string().min(1, 'Time is required'),
+  venue: z.string().min(1, 'Venue is required'),
+  eventType: z.enum(['PUBLIC', 'PRIVATE']),
+  fee: z.coerce.number().min(0),
+});
+
+type TEventForm = z.infer<typeof eventSchema>;
+
+export default function CreateEventModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<TEventForm>({
+  resolver: zodResolver(eventSchema) as any,
+  defaultValues: { eventType: 'PUBLIC', fee: 0 },
+});
+
+  const onSubmit = async (data: TEventForm) => {
+    setLoading(true);
+    try {
+      await axiosInstance.post('/events', {
+        ...data,
+        isPaid: data.fee > 0,
+      });
+      toast.success('Event created successfully!');
+      onSuccess();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to create event');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-slate-800">Create New Event</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl">
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1">
+            <Label>Title</Label>
+            <Input placeholder="Event title" {...register('title')} />
+            {errors.title && (
+              <p className="text-red-500 text-sm">{errors.title.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <Label>Description</Label>
+            <textarea
+              className="w-full border rounded-md px-3 py-2 text-sm min-h-[80px] resize-none"
+              placeholder="Event description"
+              {...register('description')}
+            />
+            {errors.description && (
+              <p className="text-red-500 text-sm">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>Date</Label>
+              <Input type="date" {...register('date')} />
+              {errors.date && (
+                <p className="text-red-500 text-sm">{errors.date.message}</p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label>Time</Label>
+              <Input type="time" {...register('time')} />
+              {errors.time && (
+                <p className="text-red-500 text-sm">{errors.time.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label>Venue</Label>
+            <Input placeholder="Event venue" {...register('venue')} />
+            {errors.venue && (
+              <p className="text-red-500 text-sm">{errors.venue.message}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>Event Type</Label>
+              <select
+                className="w-full border rounded-md px-3 py-2 text-sm"
+                {...register('eventType')}
+              >
+                <option value="PUBLIC">Public</option>
+                <option value="PRIVATE">Private</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <Label>Fee (৳)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0 for free"
+                {...register('fee')}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button type="submit" className="flex-1" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Event'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
