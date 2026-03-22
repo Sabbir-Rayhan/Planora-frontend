@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import JoinEventButton from '@/components/events/JoinEventButton';
 import EventReviews from '@/components/events/EventReviews';
 import OrganizerControls from '@/components/events/OrganizerControls';
+import AddReviewForm from '@/components/events/AddReviewForm';
 
 async function getEvent(eventId: string): Promise<IEvent | null> {
   try {
@@ -110,6 +111,8 @@ export default async function EventDetailsPage({
 
       {/* Organizer Controls — approve/reject participants */}
       <OrganizerControls event={event} />
+
+      <AddReviewForm eventId={event.id} />
 
       {/* Reviews */}
       <EventReviews eventId={event.id} />

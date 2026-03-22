@@ -24,11 +24,10 @@ export default function OrganizerControls({ event }: { event: IEvent }) {
   const [participants, setParticipants] = useState<IParticipant[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // only show for organizer or admin
+  // ── ALL hooks must be called before any return ──
   const isOrganizer = user?.id === event.organizerId;
   const isAdmin = user?.role === 'ADMIN';
-
-  if (!isAuthenticated || (!isOrganizer && !isAdmin)) return null;
+  const canManage = isAuthenticated && (isOrganizer || isAdmin);
 
   const fetchParticipants = async () => {
     try {
@@ -44,8 +43,15 @@ export default function OrganizerControls({ event }: { event: IEvent }) {
   };
 
   useEffect(() => {
-    fetchParticipants();
-  }, [event.id]);
+    if (canManage) {
+      fetchParticipants();
+    } else {
+      setLoading(false);
+    }
+  }, [event.id, canManage]);
+
+  // ── early return AFTER all hooks ──
+  if (!canManage) return null;
 
   const handleApprove = async (participationId: string) => {
     try {
@@ -96,9 +102,7 @@ export default function OrganizerControls({ event }: { event: IEvent }) {
           {isOrganizer ? 'Manage Participants' : 'Participants (Admin View)'}
         </h2>
         {pendingCount > 0 && (
-          <Badge variant="destructive">
-            {pendingCount} pending
-          </Badge>
+          <Badge variant="destructive">{pendingCount} pending</Badge>
         )}
       </div>
 

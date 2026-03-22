@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import CreateEventModal from "./CreateEventModal";
+import SendInvitation from "./SendInvitation";
 
 export default function MyEvents() {
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -83,10 +84,8 @@ export default function MyEvents() {
                 <p className="text-sm text-slate-500 mb-3">
                   👥 {event._count?.participations || 0} participants
                 </p>
-
-
-                    {/* fix */}
-                <div className="flex gap-2">
+                {/* fix */}
+                <div className="flex gap-2 flex-wrap">
                   <Link href={`/events/${event.id}`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
                       View
@@ -106,6 +105,7 @@ export default function MyEvents() {
                   >
                     Delete
                   </Button>
+                  <SendInvitation eventId={event.id} />
                 </div>
               </CardContent>
             </Card>
