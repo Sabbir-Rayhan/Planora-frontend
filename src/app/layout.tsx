@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={geist.className}>
+      <body suppressHydrationWarning className={geist.className}>
         <Providers>
           {children}
           <Toaster position="top-right" />
