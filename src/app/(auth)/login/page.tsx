@@ -5,14 +5,22 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import axiosInstance from '@/lib/axios';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Suspense } from 'react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -21,10 +29,14 @@ const loginSchema = z.object({
 
 type TLoginForm = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
+
+  // get redirect URL if present
+  const redirectTo = searchParams.get('redirect') || null;
 
   const {
     register,
@@ -42,8 +54,10 @@ export default function LoginPage() {
       setAuth(user, accessToken);
       toast.success('Login successful!');
 
-      // redirect based on role
-      if (user.role === 'ADMIN') {
+      // redirect to previous page or dashboard
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else if (user.role === 'ADMIN') {
         router.push('/dashboard/admin');
       } else {
         router.push('/dashboard/user');
@@ -65,7 +79,6 @@ export default function LoginPage() {
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Email */}
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -79,7 +92,6 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -102,12 +114,23 @@ export default function LoginPage() {
         <CardFooter className="justify-center">
           <p className="text-sm text-slate-600">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-slate-900 font-semibold hover:underline">
+            <Link
+              href="/register"
+              className="text-slate-900 font-semibold hover:underline"
+            >
               Register
             </Link>
           </p>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 import { IUser } from '@/types';
 
@@ -12,18 +13,25 @@ interface IAuthStore {
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<IAuthStore>((set) => ({
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
+export const useAuthStore = create<IAuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
 
-  setAuth: (user, token) => {
-    Cookies.set('accessToken', token, { expires: 1 });
-    set({ user, accessToken: token, isAuthenticated: true });
-  },
+      setAuth: (user, token) => {
+        Cookies.set('accessToken', token, { expires: 1 });
+        set({ user, accessToken: token, isAuthenticated: true });
+      },
 
-  clearAuth: () => {
-    Cookies.remove('accessToken');
-    set({ user: null, accessToken: null, isAuthenticated: false });
-  },
-}));
+      clearAuth: () => {
+        Cookies.remove('accessToken');
+        set({ user: null, accessToken: null, isAuthenticated: false });
+      },
+    }),
+    {
+      name: 'planora-auth', // key in localStorage
+    }
+  )
+);
