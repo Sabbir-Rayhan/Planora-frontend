@@ -1,18 +1,36 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { IEvent } from '@/types';
-import { Calendar, MapPin, ArrowRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { IEvent } from "@/types";
+import { Calendar, MapPin, ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+// async function getFeaturedEvent(): Promise<IEvent | null> {
+//   try {
+//     const apiUrl =
+//       process.env.NEXT_PUBLIC_API_URL ||
+//       "https://planora-backend-production-d7e8.up.railway.app/api/v1";
+//     const res = await fetch(`${apiUrl}/events?isFeatured=true`, {
+//       cache: "no-store",
+//     });
+//     const data = await res.json();
+//     const featured = data.data?.find((e: IEvent) => e.isFeatured === true);
+//     return featured || null;
+//   } catch {
+//     return null;
+//   }
+// }
 
 async function getFeaturedEvent(): Promise<IEvent | null> {
   try {
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/events?isFeatured=true`,
+      `${apiUrl}/events?isFeatured=true`,
       { cache: 'no-store' }
     );
     const data = await res.json();
-    // get first featured event
-    const featured = data.data?.find((e: IEvent) => e.isFeatured === true);
+    // get only the FIRST featured event
+    const events = data.data || [];
+    const featured = events.find((e: IEvent) => e.isFeatured === true);
     return featured || null;
   } catch {
     return null;
@@ -42,7 +60,7 @@ export default async function HeroSection() {
             </div>
 
             <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
-              Plan, Create &{' '}
+              Plan, Create &{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
                 Join Events
               </span>
@@ -77,9 +95,9 @@ export default async function HeroSection() {
             {/* Stats */}
             <div className="flex gap-8 mt-12 pt-8 border-t border-white/10">
               {[
-                { label: 'Events Created', value: '500+' },
-                { label: 'Active Users', value: '2K+' },
-                { label: 'Cities', value: '50+' },
+                { label: "Events Created", value: "500+" },
+                { label: "Active Users", value: "2K+" },
+                { label: "Cities", value: "50+" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <p className="text-2xl font-bold text-white">{stat.value}</p>
@@ -108,10 +126,10 @@ export default async function HeroSection() {
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center gap-2 text-slate-300 text-sm">
                     <Calendar className="w-4 h-4 text-blue-400" />
-                    {new Date(featuredEvent.date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
+                    {new Date(featuredEvent.date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </div>
                   <div className="flex items-center gap-2 text-slate-300 text-sm">
@@ -121,7 +139,7 @@ export default async function HeroSection() {
                 </div>
                 <div className="flex items-center justify-between">
                   <Badge className="bg-blue-500/30 text-blue-200 border-0">
-                    {featuredEvent.isPaid ? `৳${featuredEvent.fee}` : 'Free'}
+                    {featuredEvent.isPaid ? `৳${featuredEvent.fee}` : "Free"}
                   </Badge>
                   <Link href={`/events/${featuredEvent.id}`}>
                     <Button
@@ -142,11 +160,21 @@ export default async function HeroSection() {
                 <p className="text-slate-300 text-sm mb-6">
                   Start by creating an event and invite people to join!
                 </p>
-                <Link href="/register">
-                  <Button className="bg-blue-500 hover:bg-blue-600">
-                    Get Started
-                  </Button>
-                </Link>
+                <div className="flex gap-3 justify-center">
+                  <Link href="/dashboard/user">
+                    <Button className="bg-blue-500 hover:bg-blue-600">
+                      Create Event
+                    </Button>
+                  </Link>
+                  <Link href="/events">
+                    <Button
+                      variant="outline"
+                      className="border-white/30 text-white hover:bg-white/10"
+                    >
+                      Browse Events
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </div>

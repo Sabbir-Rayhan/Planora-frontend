@@ -3,8 +3,10 @@ import EventsSlider from './EventsSlider';
 
 async function getUpcomingEvents(): Promise<IEvent[]> {
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
+                   'https://planora-backend-production-d7e8.up.railway.app/api/v1';
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/events?status=UPCOMING&eventType=PUBLIC`,
+      `${apiUrl}/events?status=UPCOMING&eventType=PUBLIC`,
       { cache: 'no-store' }
     );
     const data = await res.json();
