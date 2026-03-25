@@ -127,7 +127,7 @@ export default function MyReviews() {
                     </div>
                     {/* Edit Comment */}
                     <textarea
-                      className="w-full border rounded-md px-3 py-2 text-sm min-h-[60px] resize-none"
+                      className="w-full border rounded-md px-3 py-2 text-sm min-h-15 resize-none"
                       value={editComment}
                       onChange={(e) => setEditComment(e.target.value)}
                     />

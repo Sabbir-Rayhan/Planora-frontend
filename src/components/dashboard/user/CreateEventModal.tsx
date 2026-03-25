@@ -78,7 +78,7 @@ const {
           <div className="space-y-1">
             <Label>Description</Label>
             <textarea
-              className="w-full border rounded-md px-3 py-2 text-sm min-h-[80px] resize-none"
+              className="w-full border rounded-md px-3 py-2 text-sm min-h-20 resize-none"
               placeholder="Event description"
               {...register('description')}
             />

@@ -76,7 +76,7 @@ export default function AdminEvents() {
             <tbody className="divide-y">
               {events.map((event) => (
                 <tr key={event.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium max-w-[200px] truncate">
+                  <td className="px-4 py-3 font-medium max-w-50 truncate">
                     {event.title}
                   </td>
                   <td className="px-4 py-3 text-slate-500">

@@ -66,7 +66,7 @@ export default function AdminPayments() {
                   <td className="px-4 py-3 font-medium">
                     {payment.user?.name}
                   </td>
-                  <td className="px-4 py-3 text-slate-500 max-w-[150px] truncate">
+                  <td className="px-4 py-3 text-slate-500 max-w-37.5 truncate">
                     {payment.event?.title}
                   </td>
                   <td className="px-4 py-3 font-medium text-green-600">

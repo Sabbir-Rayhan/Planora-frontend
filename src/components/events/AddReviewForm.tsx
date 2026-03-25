@@ -80,7 +80,7 @@ export default function AddReviewForm({ eventId }: { eventId: string }) {
         <div className="space-y-1">
           <Label>Comment</Label>
           <textarea
-            className="w-full border rounded-md px-3 py-2 text-sm min-h-[80px] resize-none bg-white"
+            className="w-full border rounded-md px-3 py-2 text-sm min-h-20 resize-none bg-white"
             placeholder="Share your experience about this event..."
             value={comment}
             onChange={(e) => setComment(e.target.value)}
