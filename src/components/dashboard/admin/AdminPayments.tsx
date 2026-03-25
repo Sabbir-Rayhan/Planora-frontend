@@ -1,8 +1,24 @@
+// components/dashboard/admin/AdminPayments.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import axiosInstance from '@/lib/axios';
 import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import toast from 'react-hot-toast';
 
 export default function AdminPayments() {
@@ -28,75 +44,78 @@ export default function AdminPayments() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-slate-800">
-          Payments
-          <span className="ml-2 text-sm font-normal text-slate-500">
-            ({payments.length} total)
-          </span>
-        </h2>
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-          <p className="text-sm text-green-600 font-medium">
-            Total Revenue: ৳{totalRevenue}
-          </p>
+    <Card className="shadow-sm border-0 overflow-hidden">
+      <CardHeader className="border-b bg-white/50">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            Payments
+            <span className="text-sm font-normal text-muted-foreground">
+              ({payments.length} total)
+            </span>
+          </CardTitle>
+          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+            <p className="text-sm text-green-600 font-medium">
+              Total Revenue: ৳{totalRevenue}
+            </p>
+          </div>
         </div>
-      </div>
-
-      {loading ? (
-        <p className="text-slate-400">Loading...</p>
-      ) : payments.length === 0 ? (
-        <p className="text-slate-400">No payments yet.</p>
-      ) : (
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>
-                <th className="text-left px-4 py-3">User</th>
-                <th className="text-left px-4 py-3">Event</th>
-                <th className="text-left px-4 py-3">Amount</th>
-                <th className="text-left px-4 py-3">Status</th>
-                <th className="text-left px-4 py-3">Transaction ID</th>
-                <th className="text-left px-4 py-3">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {payments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium">
-                    {payment.user?.name}
-                  </td>
-                  <td className="px-4 py-3 text-slate-500 max-w-37.5 truncate">
-                    {payment.event?.title}
-                  </td>
-                  <td className="px-4 py-3 font-medium text-green-600">
-                    ৳{payment.amount}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      variant={
-                        payment.status === 'PAID'
-                          ? 'default'
-                          : payment.status === 'FAILED'
-                          ? 'destructive'
-                          : 'secondary'
-                      }
-                    >
-                      {payment.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">
-                    {payment.transactionId || 'N/A'}
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {new Date(payment.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <div className="p-4 space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : payments.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">No payments yet.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Transaction ID</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell className="font-medium">{payment.user?.name}</TableCell>
+                    <TableCell className="max-w-48 truncate">{payment.event?.title}</TableCell>
+                    <TableCell className="font-medium text-green-600">
+                      ৳{payment.amount}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          payment.status === 'PAID'
+                            ? 'default'
+                            : payment.status === 'FAILED'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
+                        {payment.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
+                      {payment.transactionId || 'N/A'}
+                    </TableCell>
+                    <TableCell>{new Date(payment.createdAt).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
