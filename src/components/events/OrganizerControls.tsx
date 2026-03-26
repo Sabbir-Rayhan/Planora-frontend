@@ -17,6 +17,10 @@ interface IParticipant {
     name: string;
     email: string;
   };
+  payment?: {
+    status: string;
+    amount: number;
+  };
 }
 
 export default function OrganizerControls({ event }: { event: IEvent }) {
@@ -118,6 +122,7 @@ export default function OrganizerControls({ event }: { event: IEvent }) {
                 <th className="text-left py-2">Name</th>
                 <th className="text-left py-2">Email</th>
                 <th className="text-left py-2">Status</th>
+                {event.isPaid && <th className="text-left py-2">Payment</th>}
                 <th className="text-left py-2">Actions</th>
               </tr>
             </thead>
@@ -131,25 +136,48 @@ export default function OrganizerControls({ event }: { event: IEvent }) {
                       {p.status}
                     </Badge>
                   </td>
+                  {/* Show payment status for paid events */}
+                  {event.isPaid && (
+                    <td className="py-3">
+                      <Badge
+                        variant={
+                          p.payment?.status === 'PAID'
+                            ? 'default'
+                            : 'destructive'
+                        }
+                      >
+                        {p.payment?.status || 'NO PAYMENT'}
+                      </Badge>
+                    </td>
+                  )}
                   <td className="py-3">
                     <div className="flex gap-2">
-                      {p.status === 'PENDING' && (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(p.id)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleReject(p.id)}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
+                      {/* Only allow approve if payment is done (for paid events) */}
+                      {p.status === 'PENDING' &&
+                        (!event.isPaid || p.payment?.status === 'PAID') && (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => handleApprove(p.id)}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleReject(p.id)}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                      {p.status === 'PENDING' &&
+                        event.isPaid &&
+                        p.payment?.status !== 'PAID' && (
+                          <span className="text-xs text-slate-400">
+                            Awaiting payment
+                          </span>
+                        )}
                       {p.status === 'APPROVED' && (
                         <Button
                           size="sm"
