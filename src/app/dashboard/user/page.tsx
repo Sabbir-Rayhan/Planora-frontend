@@ -73,7 +73,7 @@ export default function UserDashboardPage() {
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="text-white text-xl font-bold">Planora</span>
@@ -87,7 +87,7 @@ export default function UserDashboardPage() {
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -118,14 +118,14 @@ export default function UserDashboardPage() {
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl
                   text-sm font-medium transition-all duration-200 text-left group
                   ${isActive
-                    ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white border border-blue-500/30'
+                    ? 'bg-linear-to-r from-blue-500/30 to-purple-500/30 text-white border border-blue-500/30'
                     : 'text-white/50 hover:bg-white/5 hover:text-white/80'
                   }
                 `}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
                   isActive
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30'
+                    ? 'bg-linear-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30'
                     : 'bg-white/5 group-hover:bg-white/10'
                 }`}>
                   <Icon className="w-4 h-4" />
@@ -137,7 +137,7 @@ export default function UserDashboardPage() {
                   </p>
                 </div>
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-6 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full" />
+                  <div className="ml-auto w-1.5 h-6 bg-linear-to-b from-blue-400 to-purple-500 rounded-full" />
                 )}
               </button>
             );
@@ -189,7 +189,7 @@ export default function UserDashboardPage() {
                 Home
               </button>
             </Link>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
           </div>
