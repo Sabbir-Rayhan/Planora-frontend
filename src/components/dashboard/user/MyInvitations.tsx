@@ -59,7 +59,7 @@ export default function MyInvitations() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-4">My Invitations</h2>
+      <h2 className="text-xl font-bold text-white mb-4">My Invitations</h2>
 
       {loading ? (
         <p className="text-slate-400">Loading...</p>

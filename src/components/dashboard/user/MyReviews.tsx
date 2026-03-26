@@ -66,7 +66,7 @@ export default function MyReviews() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-6">My Reviews</h2>
+      <h2 className="text-xl font-bold text-white mb-6">My Reviews</h2>
 
       {reviews.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border">

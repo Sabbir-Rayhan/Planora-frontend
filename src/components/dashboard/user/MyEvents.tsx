@@ -45,7 +45,8 @@ export default function MyEvents() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-slate-800">My Events</h2>
+        {/* <h2 className="text-xl font-bold text-slate-800">My Events</h2> */}
+        <h2 className="text-xl font-bold text-white mb-6">My Events</h2>
         <Button onClick={() => setShowModal(true)}>+ Create Event</Button>
       </div>
 

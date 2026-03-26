@@ -13,7 +13,9 @@ import { Label } from '@/components/ui/label';
 const eventSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
-  date: z.string().min(1, 'Date is required'),
+  date: z.string().min(1, 'Date is required').refine((val) => {
+    return new Date(val) >= new Date(new Date().toDateString());
+  }, 'Date cannot be in the past'),
   time: z.string().min(1, 'Time is required'),
   venue: z.string().min(1, 'Venue is required'),
   eventType: z.enum(['PUBLIC', 'PRIVATE']),
@@ -30,15 +32,16 @@ export default function CreateEventModal({
   onSuccess: () => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const today = new Date().toISOString().split('T')[0];
 
-const {
-  register,
-  handleSubmit,
-  formState: { errors },
-} = useForm<TEventForm>({
-  resolver: zodResolver(eventSchema) as any,
-  defaultValues: { eventType: 'PUBLIC', fee: 0 },
-});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TEventForm>({
+    resolver: zodResolver(eventSchema) as any,
+    defaultValues: { eventType: 'PUBLIC', fee: 0 },
+  });
 
   const onSubmit = async (data: TEventForm) => {
     setLoading(true);
@@ -90,7 +93,7 @@ const {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label>Date</Label>
-              <Input type="date" {...register('date')} />
+              <Input type="date" min={today} {...register('date')} />
               {errors.date && (
                 <p className="text-red-500 text-sm">{errors.date.message}</p>
               )}

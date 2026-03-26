@@ -37,9 +37,7 @@ export default function MyParticipations() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-slate-800 mb-4">
-        My Participations
-      </h2>
+      <h2 className="text-xl font-bold text-white mb-4">My Participations</h2>
 
       {loading ? (
         <p className="text-slate-400">Loading...</p>
