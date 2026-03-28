@@ -3,7 +3,7 @@
 **A modern event management platform built with Next.js 16**
 
 
-[Live Site](https://planora-frontend-orpin.vercel.app) • [Backend Repo](https://github.com/Sabbir-Rayhan/Planora-backend) • [API Docs](https://planora-backend-production-d7e8.up.railway.app/api/v1)
+[Live Site](https://planora-frontend-orpin.vercel.app) • [Backend Repo](https://github.com/Sabbir-Rayhan/Planora-backend) • [API Docs](https://planora-backend-production-d7e8.up.railway.app)
 
 
 ---
@@ -19,7 +19,7 @@ Planora is a full-stack event management platform where users can create, manage
 | Service | URL |
 |---------|-----|
 | 🌐 Frontend Live | https://planora-frontend-orpin.vercel.app |
-| 🚀 Backend API | https://planora-backend-production-d7e8.up.railway.app/api/v1 |
+| 🚀 Backend API | https://planora-backend-production-d7e8.up.railway.app |
 | 📁 Frontend Repo | https://github.com/Sabbir-Rayhan/Planora-frontend |
 | 📁 Backend Repo | https://github.com/Sabbir-Rayhan/Planora-backend |
 
