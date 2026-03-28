@@ -1,9 +1,17 @@
+<div align="center">
+
 # 🎉 Planora — Frontend
 
 **A modern event management platform built with Next.js 16**
 
+[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-cyan.svg)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black.svg)](https://vercel.com)
 
 [Live Site](https://planora-frontend-orpin.vercel.app) • [Backend Repo](https://github.com/Sabbir-Rayhan/Planora-backend) • [API Docs](https://planora-backend-production-d7e8.up.railway.app)
+
+</div>
 
 
 ---
