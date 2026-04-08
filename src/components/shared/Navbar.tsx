@@ -20,6 +20,7 @@ import {
   Mail,
   ChevronDown,
 } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, isAuthenticated, clearAuth } = useAuthStore();
@@ -28,10 +29,12 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -54,7 +57,6 @@ export default function Navbar() {
     }
   };
 
-  // Get user initials for avatar
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -64,19 +66,16 @@ export default function Navbar() {
       .slice(0, 2);
   };
 
-  // Navigation links (public)
   const publicNavLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/events", label: "Events", icon: Calendar },
   ];
 
-  // Navigation links (authenticated)
   const authenticatedNavLinks = [
     { href: "/events/my-events", label: "My Events", icon: Ticket },
     { href: "/invitations", label: "Invitations", icon: Mail },
   ];
 
-  // Dashboard link based on role
   const dashboardLink = user
     ? {
         href: user.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user",
@@ -85,10 +84,18 @@ export default function Navbar() {
       }
     : null;
 
-  const NavLink = ({ href, label, icon: Icon }: { href: string; label: string; icon: any }) => (
+  const NavLink = ({
+    href,
+    label,
+    icon: Icon,
+  }: {
+    href: string;
+    label: string;
+    icon: any;
+  }) => (
     <Link
       href={href}
-      className="flex items-center gap-2 text-slate-700 hover:text-indigo-600 transition-colors duration-200"
+      className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
       onClick={() => {
         setMobileOpen(false);
         setDropdownOpen(false);
@@ -100,7 +107,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 border-b border-indigo-100 shadow-sm">
+    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-indigo-100 dark:border-slate-700 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -123,6 +130,7 @@ export default function Navbar() {
               {dashboardLink && <NavLink {...dashboardLink} />}
             </>
           )}
+          <ThemeToggle />
         </div>
 
         {/* Desktop Auth */}
@@ -131,14 +139,16 @@ export default function Navbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-indigo-50 transition-colors duration-200"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors duration-200"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-medium">
                   {user ? getInitials(user.name) : "U"}
                 </div>
-                <span className="text-sm font-medium text-slate-700">{user?.name}</span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {user?.name}
+                </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+                  className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform duration-200 ${
                     dropdownOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -146,14 +156,18 @@ export default function Navbar() {
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-indigo-100 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-4 py-2 border-b border-indigo-50">
-                    <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                    <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-indigo-100 dark:border-slate-700 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-2 border-b border-indigo-50 dark:border-slate-700">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {user?.email}
+                    </p>
                   </div>
                   <Link
                     href="/profile"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
                     onClick={() => setDropdownOpen(false)}
                   >
                     <User className="w-4 h-4" />
@@ -161,7 +175,7 @@ export default function Navbar() {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -175,7 +189,7 @@ export default function Navbar() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300"
+                  className="rounded-full border-indigo-200 dark:border-slate-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:border-indigo-300 dark:hover:border-slate-500"
                 >
                   Login
                 </Button>
@@ -194,13 +208,13 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden p-2 rounded-full hover:bg-indigo-50 transition-colors duration-200"
+          className="md:hidden p-2 rounded-full hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors duration-200"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? (
-            <X className="w-5 h-5 text-slate-700" />
+            <X className="w-5 h-5 text-slate-700 dark:text-slate-200" />
           ) : (
-            <Menu className="w-5 h-5 text-slate-700" />
+            <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
           )}
         </button>
       </div>
@@ -211,7 +225,7 @@ export default function Navbar() {
           mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="border-t border-indigo-100 bg-white/95 backdrop-blur-sm px-4 py-4 flex flex-col gap-4">
+        <div className="border-t border-indigo-100 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-4 py-4 flex flex-col gap-4">
           {publicNavLinks.map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
@@ -221,16 +235,19 @@ export default function Navbar() {
                 <NavLink key={link.href} {...link} />
               ))}
               {dashboardLink && <NavLink {...dashboardLink} />}
-              <div className="pt-2 border-t border-indigo-100">
+              <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
                 <NavLink href="/profile" label="Profile" icon={User} />
               </div>
             </>
           )}
-          <div className="pt-2 border-t border-indigo-100">
+          <div className="flex justify-center py-2 border-t border-indigo-100 dark:border-slate-700">
+            <ThemeToggle />
+          </div>
+          <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors duration-200 w-full"
+                className="flex items-center gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200 w-full"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -240,7 +257,7 @@ export default function Navbar() {
                 <Link href="/login" onClick={() => setMobileOpen(false)}>
                   <Button
                     variant="outline"
-                    className="w-full rounded-full border-indigo-200 text-indigo-600"
+                    className="w-full rounded-full border-indigo-200 dark:border-slate-600 text-indigo-600 dark:text-indigo-400"
                   >
                     Login
                   </Button>

@@ -1,14 +1,15 @@
-import type { Metadata } from 'next';
-import { Geist } from 'next/font/google';
-import './globals.css';
-import Providers from '@/components/shared/Providers';
-import { Toaster } from 'react-hot-toast';
+import type { Metadata } from "next";
+import { Geist } from "next/font/google";
+import "./globals.css";
+import Providers from "@/components/shared/Providers";
+import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
 
-const geist = Geist({ subsets: ['latin'] });
+const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Planora — Event Management Platform',
-  description: 'Create, manage and join events easily',
+  title: "Planora — Event Management Platform",
+  description: "Create, manage and join events easily",
 };
 
 export default function RootLayout({
@@ -19,10 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning className={geist.className}>
-        <Providers>
-          {children}
-          <Toaster position="top-right" />
-        </Providers>
+        <ThemeProvider>
+          <Providers>
+            {children}
+            <Toaster position="top-right" />
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

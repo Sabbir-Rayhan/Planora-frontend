@@ -3,7 +3,7 @@ import { Mail } from "lucide-react";
 
 export default function NewsletterSection() {
   return (
-    <section className="py-16 px-4 bg-slate-900">
+    <section className="py-16 px-4 bg-slate-900 dark:bg-slate-950">
       <div className="max-w-4xl mx-auto text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-2xl mb-6">
           <Mail className="w-8 h-8 text-blue-400" />

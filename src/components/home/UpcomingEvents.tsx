@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users } from "lucide-react";
-import Image from "next/image";
 
 async function getUpcomingEvents(): Promise<IEvent[]> {
   try {
@@ -21,7 +20,6 @@ async function getUpcomingEvents(): Promise<IEvent[]> {
   }
 }
 
-// Generate a random gradient for image placeholder
 const getGradient = (seed: string) => {
   const colors = [
     "from-blue-500 to-indigo-600",
@@ -43,26 +41,28 @@ export default async function UpcomingEvents() {
   const events = await getUpcomingEvents();
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-10">
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">
+          <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm uppercase tracking-wider">
             Don&apos;t Miss Out
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-2">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mt-2">
             Upcoming Events
           </h2>
-          <p className="text-slate-500 mt-3 max-w-xl mx-auto">
+          <p className="text-slate-500 dark:text-slate-400 mt-3 max-w-xl mx-auto">
             Discover exciting public events happening soon. Join and connect
             with people who share your interests.
           </p>
         </div>
 
         {events.length === 0 ? (
-          <div className="text-center py-16 bg-slate-50 rounded-2xl">
-            <p className="text-slate-400 text-lg">No upcoming events yet.</p>
+          <div className="text-center py-16 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+            <p className="text-slate-400 dark:text-slate-500 text-lg">
+              No upcoming events yet.
+            </p>
             <Link href="/events">
-              <Button variant="outline" className="mt-4">
+              <Button variant="outline" className="mt-4 dark:border-slate-600 dark:text-slate-300">
                 Browse All Events
               </Button>
             </Link>
@@ -75,15 +75,13 @@ export default async function UpcomingEvents() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+                    className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full"
                   >
                     {/* Image Placeholder */}
                     <div
                       className={`h-40 w-full bg-gradient-to-br ${gradient} relative flex items-center justify-center`}
                     >
-                      <span className="text-white text-4xl opacity-80">
-                        🎉
-                      </span>
+                      <span className="text-white text-4xl opacity-80">🎉</span>
                       <div className="absolute top-3 left-3">
                         <Badge className="bg-white/20 text-white border-0 backdrop-blur-sm">
                           {event.eventType}
@@ -92,9 +90,7 @@ export default async function UpcomingEvents() {
                       <div className="absolute top-3 right-3">
                         <Badge
                           className={`${
-                            event.isPaid
-                              ? "bg-orange-500"
-                              : "bg-green-500"
+                            event.isPaid ? "bg-orange-500" : "bg-green-500"
                           } text-white border-0`}
                         >
                           {event.isPaid ? `৳${event.fee}` : "Free"}
@@ -104,15 +100,15 @@ export default async function UpcomingEvents() {
 
                     {/* Content */}
                     <div className="p-5 flex-1 flex flex-col">
-                      <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">
+                      <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 line-clamp-2 mb-2">
                         {event.title}
                       </h3>
-                      <p className="text-slate-500 text-sm line-clamp-2 mb-4">
+                      <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mb-4">
                         {event.description}
                       </p>
                       <div className="space-y-2 mt-auto">
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                          <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                           <span className="line-clamp-1">
                             {new Date(event.date).toLocaleDateString("en-US", {
                               month: "short",
@@ -121,12 +117,12 @@ export default async function UpcomingEvents() {
                             })}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                          <MapPin className="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                           <span className="line-clamp-1">{event.venue}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <Users className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                          <Users className="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                           <span>{event._count?.participations || 0} participants</span>
                         </div>
                       </div>
@@ -145,7 +141,7 @@ export default async function UpcomingEvents() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-slate-800 text-slate-800 hover:bg-slate-800 hover:text-white px-10 transition-colors"
+                  className="border-2 border-slate-800 dark:border-slate-600 text-slate-800 dark:text-slate-200 hover:bg-slate-800 hover:text-white dark:hover:bg-slate-700 px-10 transition-colors"
                 >
                   View All Events
                 </Button>

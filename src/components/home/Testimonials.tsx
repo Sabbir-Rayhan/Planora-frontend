@@ -23,7 +23,6 @@ async function getTestimonials(): Promise<ITestimonial[]> {
   }
 }
 
-// Professional fallback in case no reviews exist yet
 const fallbackTestimonials: ITestimonial[] = [
   {
     id: "1",
@@ -69,16 +68,16 @@ export default async function Testimonials() {
     testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-indigo-50/30">
+    <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-indigo-50/30 dark:from-slate-900 dark:to-indigo-950/30">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <span className="text-indigo-600 font-semibold text-sm uppercase tracking-wider">
+          <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-sm uppercase tracking-wider">
             Testimonials
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-3">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mt-3">
             Trusted by Event Organizers
           </h2>
-          <p className="text-slate-600 mt-4 max-w-2xl mx-auto text-lg">
+          <p className="text-slate-600 dark:text-slate-400 mt-4 max-w-2xl mx-auto text-lg">
             See what our community members say about their experience with Planora.
           </p>
         </div>
@@ -87,12 +86,10 @@ export default async function Testimonials() {
           {displayTestimonials.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl p-8 shadow-md border border-slate-100 hover:shadow-xl transition-shadow duration-300 flex flex-col"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-md border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow duration-300 flex flex-col"
             >
-              {/* Quote Icon */}
-              <Quote className="w-8 h-8 text-indigo-200 mb-4" />
+              <Quote className="w-8 h-8 text-indigo-200 dark:text-indigo-800 mb-4" />
 
-              {/* Rating Stars */}
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star
@@ -100,30 +97,27 @@ export default async function Testimonials() {
                     className={`w-4 h-4 ${
                       i < item.rating
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-slate-200"
+                        : "text-slate-200 dark:text-slate-600"
                     }`}
                   />
                 ))}
               </div>
 
-              {/* Comment */}
-              <p className="text-slate-700 mb-6 leading-relaxed flex-1">
+              <p className="text-slate-700 dark:text-slate-300 mb-6 leading-relaxed flex-1">
                 "{item.comment}"
               </p>
 
-              {/* Event Context */}
-              <p className="text-sm text-indigo-600 font-medium mb-4">
+              <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium mb-4">
                 Re: {item.eventTitle}
               </p>
 
-              {/* User Info */}
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium shadow-md">
                   {getInitials(item.userName)}
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">{item.userName}</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-semibold text-slate-800 dark:text-slate-100">{item.userName}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {new Date(item.date).toLocaleDateString("en-US", {
                       month: "short",
                       year: "numeric",
@@ -135,9 +129,8 @@ export default async function Testimonials() {
           ))}
         </div>
 
-        {/* Subtle note if using fallback */}
         {testimonials.length === 0 && (
-          <p className="text-center text-slate-400 text-sm mt-8">
+          <p className="text-center text-slate-400 dark:text-slate-500 text-sm mt-8">
             These are sample testimonials. Real reviews will appear here as users share their experiences.
           </p>
         )}

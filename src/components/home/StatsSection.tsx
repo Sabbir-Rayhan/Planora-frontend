@@ -19,7 +19,6 @@ async function getStats(): Promise<IStats | null> {
   }
 }
 
-// Fallback stats if API fails
 const fallbackStats: IStats = {
   totalEvents: 1200,
   totalUsers: 8500,
@@ -46,20 +45,20 @@ export default async function StatsSection() {
   ];
 
   return (
-    <section className="py-16 px-4 bg-white">
+    <section className="py-16 px-4 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {statItems.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+              <p className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
                 {stat.value}
               </p>
-              <p className="text-slate-500 font-medium">{stat.label}</p>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">{stat.label}</p>
             </div>
           ))}
         </div>
         {!stats && (
-          <p className="text-center text-slate-400 text-sm mt-6">
+          <p className="text-center text-slate-400 dark:text-slate-500 text-sm mt-6">
             Statistics update in real-time as the community grows.
           </p>
         )}

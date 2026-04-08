@@ -5,37 +5,37 @@ const features = [
     icon: CalendarCheck,
     title: "Easy Event Creation",
     description: "Create and manage events in minutes with our intuitive tools.",
-    color: "bg-blue-100 text-blue-600",
+    color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
   },
   {
     icon: Users,
     title: "Community Building",
     description: "Connect with like-minded people and grow your network.",
-    color: "bg-purple-100 text-purple-600",
+    color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
   },
   {
     icon: Lock,
     title: "Privacy Controls",
     description: "Choose between public and private events with full control.",
-    color: "bg-green-100 text-green-600",
+    color: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
   },
   {
     icon: Sparkles,
     title: "Smart Recommendations",
     description: "Get personalized event suggestions based on your interests.",
-    color: "bg-orange-100 text-orange-600",
+    color: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400",
   },
 ];
 
 export default function FeaturesSection() {
   return (
-    <section className="py-16 px-4 bg-slate-50">
+    <section className="py-16 px-4 bg-slate-50 dark:bg-slate-900/50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">
             Why Choose Planora?
           </h2>
-          <p className="text-slate-500 mt-3 max-w-xl mx-auto">
+          <p className="text-slate-500 dark:text-slate-400 mt-3 max-w-xl mx-auto">
             Everything you need to create, manage, and discover amazing events.
           </p>
         </div>
@@ -43,17 +43,17 @@ export default function FeaturesSection() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-100"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-slate-100 dark:border-slate-700"
             >
               <div
                 className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-4`}
               >
                 <feature.icon className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg text-slate-800 mb-2">
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-slate-500 text-sm">{feature.description}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">{feature.description}</p>
             </div>
           ))}
         </div>
