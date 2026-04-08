@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import EventFilters from '@/components/events/EventFilters';
+import AISearchBar from '@/components/shared/AISearchBar'; // <-- Added import
 
 async function getEvents(searchParams: Record<string, string>): Promise<IEvent[]> {
   try {
@@ -37,8 +38,14 @@ export default async function EventsPage({
         </p>
       </div>
 
-      {/* Filters */}
-      <EventFilters />
+      {/* Combined AI Search and Regular Filters */}
+      <div className="mb-6 space-y-3">
+        <AISearchBar
+          placeholder="Search events with AI suggestions..."
+          className="w-full"
+        />
+        <EventFilters />
+      </div>
 
       {/* Events Grid */}
       {events.length === 0 ? (

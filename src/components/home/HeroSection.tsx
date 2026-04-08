@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { IEvent } from "@/types";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import AISearchBar from "@/components/shared/AISearchBar";  // <-- added import
 
 async function getFeaturedEvent(): Promise<IEvent | null> {
   try {
@@ -18,6 +19,8 @@ async function getFeaturedEvent(): Promise<IEvent | null> {
     return null;
   }
 }
+
+
 
 export default async function HeroSection() {
   const featuredEvent = await getFeaturedEvent();
@@ -72,6 +75,14 @@ export default async function HeroSection() {
                   Get Started Free
                 </Button>
               </Link>
+            </div>
+
+            {/* AI Search Bar - added as requested */}
+            <div className="mt-8">
+              <AISearchBar
+                placeholder="Search for events..."
+                className="max-w-md"
+              />
             </div>
 
             {/* Stats */}

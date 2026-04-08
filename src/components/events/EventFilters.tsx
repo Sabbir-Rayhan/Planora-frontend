@@ -1,53 +1,48 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Input } from '@/components/ui/input';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EventFilters() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [eventType, setEventType] = useState(searchParams.get('eventType') || '');
   const [isPaid, setIsPaid] = useState(searchParams.get('isPaid') || '');
 
+  // Sync state when URL changes (e.g., AI search bar updates)
+  useEffect(() => {
+    setEventType(searchParams.get('eventType') || '');
+    setIsPaid(searchParams.get('isPaid') || '');
+  }, [searchParams]);
+
   const applyFilters = () => {
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
+    const params = new URLSearchParams(searchParams.toString());
     if (eventType) params.set('eventType', eventType);
+    else params.delete('eventType');
     if (isPaid) params.set('isPaid', isPaid);
-    router.push(`/events?${params.toString()}`);
+    else params.delete('isPaid');
+    // ✅ Preserves the 'search' param from AI search bar
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    setSearch('');
     setEventType('');
     setIsPaid('');
-    router.push('/events');
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('eventType');
+    params.delete('isPaid');
+    // ✅ Keeps 'search' param if present
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   return (
     <div className="bg-slate-50 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
-      {/* Search */}
-      <div className="flex-1">
-        <label className="text-sm font-medium text-slate-600 mb-1 block">
-          Search
-        </label>
-        <Input
-          placeholder="Search events..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-        />
-      </div>
-
       {/* Event Type */}
       <div>
-        <label className="text-sm font-medium text-slate-600 mb-1 block">
-          Type
-        </label>
+        <label className="text-sm font-medium text-slate-600 mb-1 block">Type</label>
         <select
           value={eventType}
           onChange={(e) => setEventType(e.target.value)}
@@ -61,9 +56,7 @@ export default function EventFilters() {
 
       {/* Payment */}
       <div>
-        <label className="text-sm font-medium text-slate-600 mb-1 block">
-          Fee
-        </label>
+        <label className="text-sm font-medium text-slate-600 mb-1 block">Fee</label>
         <select
           value={isPaid}
           onChange={(e) => setIsPaid(e.target.value)}
@@ -77,9 +70,9 @@ export default function EventFilters() {
 
       {/* Buttons */}
       <div className="flex gap-2">
-        <Button onClick={applyFilters}>Search</Button>
+        <Button onClick={applyFilters}>Apply Filters</Button>
         <Button variant="outline" onClick={clearFilters}>
-          Clear
+          Clear Filters
         </Button>
       </div>
     </div>
