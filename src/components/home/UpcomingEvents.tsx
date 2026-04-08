@@ -1,20 +1,43 @@
-import { IEvent } from '@/types';
-import EventsSlider from './EventsSlider';
+import { IEvent } from "@/types";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users } from "lucide-react";
+import Image from "next/image";
 
 async function getUpcomingEvents(): Promise<IEvent[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
-                   'https://planora-backend-production-d7e8.up.railway.app/api/v1';
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      "https://planora-backend-production-d7e8.up.railway.app/api/v1";
     const res = await fetch(
-      `${apiUrl}/events?status=UPCOMING&eventType=PUBLIC`,
-      { cache: 'no-store' }
+      `${apiUrl}/events?status=UPCOMING&eventType=PUBLIC&limit=8`,
+      { cache: "no-store" }
     );
     const data = await res.json();
-    return data.data?.slice(0, 9) || [];
+    return data.data?.slice(0, 8) || [];
   } catch {
     return [];
   }
 }
+
+// Generate a random gradient for image placeholder
+const getGradient = (seed: string) => {
+  const colors = [
+    "from-blue-500 to-indigo-600",
+    "from-purple-500 to-pink-600",
+    "from-green-500 to-emerald-600",
+    "from-orange-500 to-red-600",
+    "from-teal-500 to-cyan-600",
+    "from-rose-500 to-pink-600",
+    "from-amber-500 to-yellow-600",
+    "from-sky-500 to-blue-600",
+  ];
+  const index =
+    seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    colors.length;
+  return colors[index];
+};
 
 export default async function UpcomingEvents() {
   const events = await getUpcomingEvents();
@@ -24,7 +47,7 @@ export default async function UpcomingEvents() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-10">
           <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">
-            Don't Miss Out
+            Don&apos;t Miss Out
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-2">
             Upcoming Events
@@ -34,7 +57,102 @@ export default async function UpcomingEvents() {
             with people who share your interests.
           </p>
         </div>
-        <EventsSlider events={events} />
+
+        {events.length === 0 ? (
+          <div className="text-center py-16 bg-slate-50 rounded-2xl">
+            <p className="text-slate-400 text-lg">No upcoming events yet.</p>
+            <Link href="/events">
+              <Button variant="outline" className="mt-4">
+                Browse All Events
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {events.map((event) => {
+                const gradient = getGradient(event.id);
+                return (
+                  <div
+                    key={event.id}
+                    className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+                  >
+                    {/* Image Placeholder */}
+                    <div
+                      className={`h-40 w-full bg-gradient-to-br ${gradient} relative flex items-center justify-center`}
+                    >
+                      <span className="text-white text-4xl opacity-80">
+                        🎉
+                      </span>
+                      <div className="absolute top-3 left-3">
+                        <Badge className="bg-white/20 text-white border-0 backdrop-blur-sm">
+                          {event.eventType}
+                        </Badge>
+                      </div>
+                      <div className="absolute top-3 right-3">
+                        <Badge
+                          className={`${
+                            event.isPaid
+                              ? "bg-orange-500"
+                              : "bg-green-500"
+                          } text-white border-0`}
+                        >
+                          {event.isPaid ? `৳${event.fee}` : "Free"}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-2">
+                        {event.title}
+                      </h3>
+                      <p className="text-slate-500 text-sm line-clamp-2 mb-4">
+                        {event.description}
+                      </p>
+                      <div className="space-y-2 mt-auto">
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <span className="line-clamp-1">
+                            {new Date(event.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <span className="line-clamp-1">{event.venue}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          <Users className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <span>{event._count?.participations || 0} participants</span>
+                        </div>
+                      </div>
+                      <Link href={`/events/${event.id}`} className="mt-4">
+                        <Button className="w-full" size="sm">
+                          View Details
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-10">
+              <Link href="/events">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-slate-800 text-slate-800 hover:bg-slate-800 hover:text-white px-10 transition-colors"
+                >
+                  View All Events
+                </Button>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

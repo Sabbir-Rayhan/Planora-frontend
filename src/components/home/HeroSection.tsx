@@ -4,31 +4,13 @@ import { IEvent } from "@/types";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-// async function getFeaturedEvent(): Promise<IEvent | null> {
-//   try {
-//     const apiUrl =
-//       process.env.NEXT_PUBLIC_API_URL ||
-//       "https://planora-backend-production-d7e8.up.railway.app/api/v1";
-//     const res = await fetch(`${apiUrl}/events?isFeatured=true`, {
-//       cache: "no-store",
-//     });
-//     const data = await res.json();
-//     const featured = data.data?.find((e: IEvent) => e.isFeatured === true);
-//     return featured || null;
-//   } catch {
-//     return null;
-//   }
-// }
-
 async function getFeaturedEvent(): Promise<IEvent | null> {
   try {
     const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
-    const res = await fetch(
-      `${apiUrl}/events?isFeatured=true`,
-      { cache: 'no-store' }
-    );
+    const res = await fetch(`${apiUrl}/events?isFeatured=true`, {
+      cache: "no-store",
+    });
     const data = await res.json();
-    // get only the FIRST featured event
     const events = data.data || [];
     const featured = events.find((e: IEvent) => e.isFeatured === true);
     return featured || null;
@@ -41,14 +23,14 @@ export default async function HeroSection() {
   const featuredEvent = await getFeaturedEvent();
 
   return (
-    <section className="relative bg-linear-to-br from-slate-900 via-blue-900 to-slate-900 text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white overflow-hidden min-h-[70vh] flex items-center">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full opacity-10 blur-3xl" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 py-24">
+      <div className="relative max-w-7xl mx-auto px-4 py-12 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div>
@@ -61,7 +43,7 @@ export default async function HeroSection() {
 
             <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
               Plan, Create &{" "}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                 Join Events
               </span>
             </h1>
