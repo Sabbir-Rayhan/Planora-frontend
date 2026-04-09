@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, Sparkles, X, Loader2 } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Search, Sparkles, X, Loader2 } from "lucide-react";
 
 export default function AISearchBar({
-  placeholder = 'Search events...',
-  className = '',
+  placeholder = "Search events...",
+  className = "",
 }: {
   placeholder?: string;
   className?: string;
 }) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -25,8 +25,8 @@ export default function AISearchBar({
 
   // Sync input with URL search param on mount and URL changes
   useEffect(() => {
-    const searchParam = searchParams.get('search');
-    setQuery(searchParam || '');
+    const searchParam = searchParams.get("search");
+    setQuery(searchParam || "");
   }, [searchParams]);
 
   // fetch AI suggestions
@@ -38,9 +38,9 @@ export default function AISearchBar({
 
     setLoading(true);
     try {
-      const res = await fetch('/api/ai-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/ai-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: value }),
       });
       const data = await res.json();
@@ -58,7 +58,7 @@ export default function AISearchBar({
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    
+
     if (query.trim().length >= 2) {
       debounceRef.current = setTimeout(() => {
         fetchSuggestions(query);
@@ -78,12 +78,15 @@ export default function AISearchBar({
   // close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Preserve existing URL params when searching
@@ -91,22 +94,22 @@ export default function AISearchBar({
     if (!searchQuery.trim()) return;
     setShowSuggestions(false);
     const params = new URLSearchParams(searchParams.toString());
-    params.set('search', searchQuery.trim());
+    params.set("search", searchQuery.trim());
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestions) return;
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedIndex((prev) =>
-        prev < suggestions.length - 1 ? prev + 1 : prev
+        prev < suggestions.length - 1 ? prev + 1 : prev,
       );
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-    } else if (e.key === 'Enter') {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (selectedIndex >= 0) {
         const selected = suggestions[selectedIndex];
@@ -115,17 +118,17 @@ export default function AISearchBar({
       } else {
         handleSearch(query);
       }
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setShowSuggestions(false);
     }
   };
 
   const clearSearch = () => {
-    setQuery('');
+    setQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
     const params = new URLSearchParams(searchParams.toString());
-    params.delete('search');
+    params.delete("search");
     router.push(`${pathname}?${params.toString()}`);
     inputRef.current?.focus();
   };
@@ -153,7 +156,10 @@ export default function AISearchBar({
             <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
           )}
           {query && !loading && (
-            <button onClick={clearSearch} className="text-slate-400 hover:text-slate-600">
+            <button
+              onClick={clearSearch}
+              className="text-slate-400 hover:text-slate-600"
+            >
               <X className="w-4 h-4" />
             </button>
           )}
@@ -189,15 +195,13 @@ export default function AISearchBar({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors ${
                     selectedIndex === index
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   <Search className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <span>{suggestion}</span>
-                  <span className="ml-auto text-xs text-slate-400">
-                    ↵
-                  </span>
+                  <span className="ml-auto text-xs text-slate-400">↵</span>
                 </button>
               </li>
             ))}
@@ -207,7 +211,7 @@ export default function AISearchBar({
           <div className="px-4 py-2 bg-slate-50 border-t border-slate-100">
             <p className="text-xs text-slate-400 flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
-              Powered by OpenRouter AI
+              Powered by Google Gemini AI
             </p>
           </div>
         </div>

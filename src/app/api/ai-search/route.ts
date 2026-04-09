@@ -1,87 +1,125 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL; // Your existing backend URL
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+// Smart fallback in case API fails
+const eventKeywords: Record<string, string[]> = {
+  tech: ['Tech Meetup', 'Technology Workshop', 'Tech Conference', 'Software Development Seminar', 'IT Career Fair'],
+  web: ['Web Development Workshop', 'Web Design Bootcamp', 'Frontend Development', 'Full Stack Conference', 'Web3 Summit'],
+  music: ['Music Concert', 'Live Music Night', 'Music Festival', 'Band Performance', 'Classical Music Evening'],
+  food: ['Food Festival', 'Cooking Workshop', 'Street Food Fair', 'Chef Masterclass', 'Food & Culture Expo'],
+  sport: ['Sports Tournament', 'Football Championship', 'Cricket League', 'Sports Day', 'Marathon Event'],
+  cricket: ['Cricket Tournament', 'Cricket League Match', 'Cricket Training Camp', 'T20 Championship', 'Cricket Club Event'],
+  football: ['Football Tournament', 'Football League', 'Football Training', 'Soccer Championship', 'Football Gala'],
+  business: ['Business Summit', 'Startup Conference', 'Entrepreneurship Workshop', 'Business Networking', 'Investment Forum'],
+  art: ['Art Exhibition', 'Photography Workshop', 'Art & Craft Fair', 'Creative Workshop', 'Design Showcase'],
+  education: ['Educational Seminar', 'Learning Workshop', 'Career Guidance Session', 'Scholarship Fair', 'Academic Conference'],
+  health: ['Health & Wellness Fair', 'Yoga Workshop', 'Medical Seminar', 'Fitness Challenge', 'Mental Health Awareness'],
+  cultural: ['Cultural Festival', 'Cultural Night', 'Heritage Fair', 'Cultural Exchange', 'Traditional Dance Show'],
+  birthday: ['Birthday Party', 'Birthday Celebration', 'Birthday Gala', 'Surprise Birthday Event', 'Kids Birthday Party'],
+  wedding: ['Wedding Ceremony', 'Wedding Reception', 'Bridal Shower', 'Wedding Planning Workshop', 'Anniversary Celebration'],
+  ramadan: ['Ramadan Iftar Party', 'Ramadan Gathering', 'Eid Celebration', 'Ramadan Night Event', 'Iftar Networking'],
+  eid: ['Eid Celebration', 'Eid Gala Night', 'Eid Festival', 'Eid Reunion', 'Eid Cultural Show'],
+  seminar: ['Career Seminar', 'Leadership Seminar', 'Professional Development Seminar', 'Academic Seminar', 'Tech Seminar'],
+  workshop: ['Creative Workshop', 'Skill Development Workshop', 'Photography Workshop', 'Cooking Workshop', 'Leadership Workshop'],
+  meetup: ['Tech Meetup', 'Developer Meetup', 'Designer Meetup', 'Startup Meetup', 'Community Meetup'],
+  party: ['Networking Party', 'Rooftop Party', 'Pool Party', 'Garden Party', 'Corporate Party'],
+  conference: ['Tech Conference', 'Business Conference', 'Academic Conference', 'Leadership Conference', 'Innovation Conference'],
+  dhaka: ['Dhaka Tech Event', 'Dhaka Music Festival', 'Dhaka Food Fair', 'Dhaka Business Summit', 'Dhaka Cultural Night'],
+  yoga: ['Yoga Workshop', 'Morning Yoga Session', 'Yoga Retreat', 'Mindfulness & Yoga', 'Yoga for Beginners'],
+  career: ['Career Fair', 'Career Guidance Session', 'Job Fair', 'Career Development Workshop', 'Professional Networking'],
+  startup: ['Startup Conference', 'Startup Pitch Night', 'Startup Networking', 'Startup Bootcamp', 'Entrepreneur Summit'],
+  dance: ['Dance Performance', 'Dance Workshop', 'Cultural Dance Show', 'Dance Competition', 'Dance Night Event'],
+  run: ['Running Marathon', 'Fun Run Event', 'Running Club Meetup', 'Run for Charity', 'Runner\'s Workshop'],
+};
+
+function getFallbackSuggestions(query: string): string[] {
+  const lowerQuery = query.toLowerCase().trim();
+  const suggestions = new Set<string>();
+
+  for (const [keyword, events] of Object.entries(eventKeywords)) {
+    if (keyword.includes(lowerQuery) || lowerQuery.includes(keyword)) {
+      events.forEach(e => suggestions.add(e));
+    }
+  }
+
+  if (suggestions.size < 3) {
+    for (const [keyword, events] of Object.entries(eventKeywords)) {
+      if (lowerQuery.length >= 2 && keyword.startsWith(lowerQuery.slice(0, 2))) {
+        events.slice(0, 2).forEach(e => suggestions.add(e));
+      }
+    }
+  }
+
+  if (suggestions.size === 0) {
+    const cap = query.charAt(0).toUpperCase() + query.slice(1);
+    [`${cap} Event`, `${cap} Workshop`, `${cap} Conference`, `${cap} Meetup`, `${cap} Festival`]
+      .forEach(e => suggestions.add(e));
+  }
+
+  return Array.from(suggestions).slice(0, 5);
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { query } = await req.json();
+
     if (!query || query.trim().length < 2) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    let suggestions: string[] = [];
-    let usingFallback = false;
+    // Try Gemini AI first
+    try {
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' });
 
-    // 1. Try OpenRouter AI (if API key is configured)
-    if (OPENROUTER_API_KEY) {
-      try {
-        const response = await fetch(OPENROUTER_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-            'X-Title': 'Planora Event Search',
-          },
-          body: JSON.stringify({
-            model: 'mistralai/mistral-7b-instruct:free',
-            messages: [
-              {
-                role: 'user',
-                content: `Generate 5 short event search query suggestions based on the user's input. Return ONLY a JSON array of strings, nothing else. Input: "${query}"`,
-              },
-            ],
-            max_tokens: 200,
-            temperature: 0.7,
-          }),
+      const prompt = `You are a search suggestion engine for an event management platform called Planora based in Bangladesh.
+
+User typed: "${query}"
+
+Generate exactly 5 smart, relevant event search suggestions.
+
+Rules:
+- Each suggestion must be a short event title (2-5 words)
+- Make them relevant to what user typed
+- Mix specific and general event types
+- Consider Bangladesh context (Dhaka, Chittagong, local events)
+- Return ONLY a valid JSON array of 5 strings
+- No explanation, no markdown, just the JSON array
+
+Example output: ["Tech Meetup Dhaka", "Technology Workshop", "IT Conference 2026", "Software Dev Seminar", "Coding Bootcamp"]
+
+Output:`;
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text().trim();
+
+      // clean the response — remove markdown if present
+      const cleaned = text
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+
+      const suggestions = JSON.parse(cleaned);
+
+      if (Array.isArray(suggestions) && suggestions.length > 0) {
+        return NextResponse.json({
+          suggestions: suggestions.slice(0, 5),
+          source: 'gemini'
         });
-
-        const data = await response.json();
-        if (data.error) {
-          console.error('OpenRouter error:', data.error);
-          throw new Error(data.error.message);
-        }
-
-        const aiText = data.choices?.[0]?.message?.content || '';
-        const jsonMatch = aiText.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          suggestions = JSON.parse(jsonMatch[0]);
-        } else {
-          suggestions = aiText.split('\n').filter((s: string) => s.trim().length > 0);
-        }
-        if (!Array.isArray(suggestions)) suggestions = [];
-      } catch (aiError) {
-        console.error('OpenRouter failed, using fallback:', aiError);
-        usingFallback = true;
       }
-    } else {
-      usingFallback = true;
+
+      throw new Error('Invalid response format');
+
+    } catch (geminiError) {
+      console.error('Gemini failed, using fallback:', geminiError);
+      // use smart fallback
+      const suggestions = getFallbackSuggestions(query);
+      return NextResponse.json({ suggestions, source: 'fallback' });
     }
 
-    // 2. Fallback: fetch events from backend API and return titles that match query
-    if (suggestions.length === 0 && BACKEND_API_URL) {
-      try {
-        const res = await fetch(`${BACKEND_API_URL}/events?search=${encodeURIComponent(query)}&limit=5`, {
-          cache: 'no-store',
-        });
-        const data = await res.json();
-        const events = data.data || [];
-        suggestions = events.map((event: any) => event.title).slice(0, 5);
-        usingFallback = true;
-      } catch (fetchError) {
-        console.error('Fallback event fetch failed:', fetchError);
-        suggestions = [];
-      }
-    }
-
-    return NextResponse.json({ suggestions, fallback: usingFallback });
   } catch (error) {
-    console.error('Search endpoint error:', error);
-    return NextResponse.json(
-      { suggestions: [], error: 'Search unavailable' },
-      { status: 500 }
-    );
+    console.error('AI search error:', error);
+    return NextResponse.json({ suggestions: [] });
   }
 }
