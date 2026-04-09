@@ -80,7 +80,7 @@ export default async function HeroSection() {
             {/* AI Search Bar - added as requested */}
             <div className="mt-8">
               <AISearchBar
-                placeholder="Search for events..."
+                placeholder="Search for events with Ai..."
                 className="max-w-md"
               />
             </div>
