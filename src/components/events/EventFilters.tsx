@@ -12,7 +12,6 @@ export default function EventFilters() {
   const [eventType, setEventType] = useState(searchParams.get('eventType') || '');
   const [isPaid, setIsPaid] = useState(searchParams.get('isPaid') || '');
 
-  // Sync state when URL changes (e.g., AI search bar updates)
   useEffect(() => {
     setEventType(searchParams.get('eventType') || '');
     setIsPaid(searchParams.get('isPaid') || '');
@@ -24,7 +23,6 @@ export default function EventFilters() {
     else params.delete('eventType');
     if (isPaid) params.set('isPaid', isPaid);
     else params.delete('isPaid');
-    // ✅ Preserves the 'search' param from AI search bar
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -34,19 +32,20 @@ export default function EventFilters() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('eventType');
     params.delete('isPaid');
-    // ✅ Keeps 'search' param if present
     router.push(`${pathname}?${params.toString()}`);
   };
 
   return (
-    <div className="bg-slate-50 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
       {/* Event Type */}
       <div>
-        <label className="text-sm font-medium text-slate-600 mb-1 block">Type</label>
+        <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+          Type
+        </label>
         <select
           value={eventType}
           onChange={(e) => setEventType(e.target.value)}
-          className="border rounded-md px-3 py-2 text-sm bg-white"
+          className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
         >
           <option value="">All Types</option>
           <option value="PUBLIC">Public</option>
@@ -56,11 +55,13 @@ export default function EventFilters() {
 
       {/* Payment */}
       <div>
-        <label className="text-sm font-medium text-slate-600 mb-1 block">Fee</label>
+        <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">
+          Fee
+        </label>
         <select
           value={isPaid}
           onChange={(e) => setIsPaid(e.target.value)}
-          className="border rounded-md px-3 py-2 text-sm bg-white"
+          className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
         >
           <option value="">All</option>
           <option value="false">Free</option>
