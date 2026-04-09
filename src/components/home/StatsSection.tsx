@@ -7,9 +7,9 @@ interface IStats {
 
 async function getStats(): Promise<IStats | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
     const res = await fetch(`${apiUrl}/events/stats`, {
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
     const data = await res.json();
     return data.data;

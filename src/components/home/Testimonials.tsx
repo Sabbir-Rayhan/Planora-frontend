@@ -11,9 +11,9 @@ interface ITestimonial {
 
 async function getTestimonials(): Promise<ITestimonial[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
     const res = await fetch(`${apiUrl}/reviews/testimonials?limit=3`, {
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
     const data = await res.json();
     return data.data || [];
