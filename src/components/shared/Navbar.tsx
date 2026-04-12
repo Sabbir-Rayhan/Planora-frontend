@@ -2,46 +2,40 @@
 
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axios";
 import { useState, useRef, useEffect } from "react";
 import {
-  Menu,
-  X,
-  Home,
-  Calendar,
-  LayoutDashboard,
-  User,
-  LogOut,
-  CalendarPlus,
-  Ticket,
-  Mail,
-  ChevronDown,
-  BookOpen,
-  Users,
+  Menu, X, Home, Calendar, LayoutDashboard,
+  User, LogOut, Ticket, Mail, ChevronDown,
+  BookOpen, Users, Phone, Sparkles, Zap,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, isAuthenticated, clearAuth } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [pagesOpen, setPagesOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLDivElement>(null);
 
-  // Handle click outside for both dropdowns
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
         setDropdownOpen(false);
-      }
-      if (pagesRef.current && !pagesRef.current.contains(event.target as Node)) {
+      if (pagesRef.current && !pagesRef.current.contains(e.target as Node))
         setPagesOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -62,280 +56,321 @@ export default function Navbar() {
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const getInitials = (name: string) =>
+    name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
-  const publicNavLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/events", label: "Events", icon: Calendar },
-  ];
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
-  // Pages dropdown items
   const pages = [
-    { href: "/about", label: "About Us", icon: Users, desc: "Learn about Planora" },
-    { href: "/contact", label: "Contact", icon: Mail, desc: "Get in touch with us" },
-    { href: "/blog", label: "Blog", icon: BookOpen, desc: "Tips and insights" },
+    { href: "/about", label: "About Us", icon: Users, desc: "Our story & mission" },
+    { href: "/contact", label: "Contact", icon: Phone, desc: "Get in touch" },
+    { href: "/blog", label: "Blog", icon: BookOpen, desc: "Tips & insights" },
   ];
 
-  const authenticatedNavLinks = [
-    { href: "/events/my-events", label: "My Events", icon: Ticket },
-    { href: "/invitations", label: "Invitations", icon: Mail },
-  ];
-
-  const dashboardLink = user
-    ? {
-        href: user.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-      }
-    : null;
-
-  const NavLink = ({
-    href,
-    label,
-    icon: Icon,
-  }: {
-    href: string;
-    label: string;
-    icon: any;
-  }) => (
-    <Link
-      href={href}
-      className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
-      onClick={() => {
-        setMobileOpen(false);
-        setDropdownOpen(false);
-        setPagesOpen(false);
-      }}
-    >
-      <Icon className="w-4 h-4" />
-      <span>{label}</span>
-    </Link>
-  );
+  const dashboardHref = user?.role === "ADMIN" ? "/dashboard/admin" : "/dashboard/user";
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-indigo-100 dark:border-slate-700 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
-        >
-          Planora
-        </Link>
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "bg-white/85 dark:bg-slate-950/90 backdrop-blur-2xl shadow-lg shadow-indigo-500/5 border-b border-indigo-100/60 dark:border-indigo-900/40"
+            : "bg-transparent"
+        }`}
+      >
+        {/* Thin accent line at top */}
+        <div className="h-0.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-1">
-          <NavLink href="/" label="Home" icon={Home} />
-          <NavLink href="/events" label="Events" icon={Calendar} />
+        <div className="max-w-7xl mx-auto px-6 h-[68px] flex items-center justify-between gap-8">
 
-          {/* Pages Dropdown */}
-          <div className="relative" ref={pagesRef}>
-            <button
-              onClick={() => setPagesOpen(!pagesOpen)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Pages</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${pagesOpen ? "rotate-180" : ""}`} />
-            </button>
+          {/* ── Logo ── */}
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-shadow">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Planora
+            </span>
+          </Link>
 
-            {pagesOpen && (
-              <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-indigo-100 dark:border-slate-700 py-2 z-50">
-                {pages.map((page) => {
-                  const Icon = page.icon;
-                  return (
-                    <Link
-                      key={page.href}
-                      href={page.href}
-                      onClick={() => setPagesOpen(false)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{page.label}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{page.desc}</p>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {/* ── Desktop Nav Links ── */}
+          <div className="hidden lg:flex items-center gap-1">
 
-          {isAuthenticated && (
-            <>
-              <NavLink href="/events/my-events" label="My Events" icon={Ticket} />
-              <NavLink href="/invitations" label="Invitations" icon={Mail} />
-              {dashboardLink && <NavLink {...dashboardLink} />}
-            </>
-          )}
-          <ThemeToggle />
-        </div>
+            {/* Home */}
+            <NavItem href="/" label="Home" active={isActive("/")} onClick={() => {}} />
 
-        {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-3">
-          {isAuthenticated ? (
-            <div className="relative" ref={dropdownRef}>
+            {/* Events */}
+            <NavItem href="/events" label="Events" active={isActive("/events")} onClick={() => {}} />
+
+            {/* Pages Dropdown */}
+            <div className="relative" ref={pagesRef}>
               <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors duration-200"
+                onClick={() => setPagesOpen((p) => !p)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  pagesOpen
+                    ? "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
+                    : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/30"
+                }`}
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-medium">
-                  {user ? getInitials(user.name) : "U"}
-                </div>
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {user?.name}
-                </span>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform duration-200 ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
+                <BookOpen className="w-4 h-4" />
+                Pages
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${pagesOpen ? "rotate-180" : ""}`} />
               </button>
 
-              {/* Dropdown Menu */}
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-indigo-100 dark:border-slate-700 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-4 py-2 border-b border-indigo-50 dark:border-slate-700">
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {user?.name}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {user?.email}
-                    </p>
+              {pagesOpen && (
+                <div className="absolute left-0 top-full mt-2 w-60 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 border border-indigo-100/80 dark:border-indigo-900/60 overflow-hidden">
+                  {/* Gradient header */}
+                  <div className="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+                  <div className="p-2">
+                    {pages.map((page) => {
+                      const Icon = page.icon;
+                      return (
+                        <Link
+                          key={page.href}
+                          href={page.href}
+                          onClick={() => setPagesOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors group"
+                        >
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 flex items-center justify-center group-hover:from-indigo-500/20 group-hover:to-purple-500/20 transition-all flex-shrink-0">
+                            <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{page.label}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{page.desc}</p>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </button>
                 </div>
               )}
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full border-indigo-200 dark:border-slate-600 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:border-indigo-300 dark:hover:border-slate-500"
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button
-                  size="sm"
-                  className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
-                >
-                  Register
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden p-2 rounded-full hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors duration-200"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? (
-            <X className="w-5 h-5 text-slate-700 dark:text-slate-200" />
-          ) : (
-            <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="border-t border-indigo-100 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-4 py-4 flex flex-col gap-4">
-          {publicNavLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
-          ))}
-
-          {/* Pages Section in Mobile Menu */}
-          <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
-            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2 px-1">
-              Pages
-            </p>
-            {pages.map((page) => (
-              <NavLink
-                key={page.href}
-                href={page.href}
-                label={page.label}
-                icon={page.icon}
-              />
-            ))}
+            {/* Authenticated links */}
+            {isAuthenticated && (
+              <>
+                <NavItem href="/dashboard/user/events" label="My Events" active={isActive("/dashboard/user/events")} onClick={() => {}} />
+                <NavItem href="/invitations" label="Invitations" active={isActive("/invitations")} onClick={() => {}} />
+                <NavItem href={dashboardHref} label="Dashboard" active={isActive(dashboardHref)} onClick={() => {}} />
+              </>
+            )}
           </div>
 
-          {isAuthenticated && (
-            <>
-              {authenticatedNavLinks.map((link) => (
-                <NavLink key={link.href} {...link} />
-              ))}
-              {dashboardLink && <NavLink {...dashboardLink} />}
-              <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
-                <NavLink href="/profile" label="Profile" icon={User} />
-              </div>
-            </>
-          )}
-          <div className="flex justify-center py-2 border-t border-indigo-100 dark:border-slate-700">
+          {/* ── Right Side ── */}
+          <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-          </div>
-          <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
+
             {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200 w-full"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen((d) => !d)}
+                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl border border-indigo-100 dark:border-indigo-900/60 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-all duration-200 group"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-indigo-500/30">
+                    {user ? getInitials(user.name) : "U"}
+                  </div>
+                  <div className="text-left hidden xl:block">
+                    <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-none">
+                      {user?.name?.split(" ")[0]}
+                    </p>
+                    <p className="text-[10px] text-indigo-500 dark:text-indigo-400 mt-0.5 font-medium">
+                      {user?.role}
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/10 border border-indigo-100/80 dark:border-indigo-900/60 overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+
+                    {/* User info */}
+                    <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                          {user ? getInitials(user.name) : "U"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
+                          <span className="inline-block mt-0.5 text-[10px] bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">
+                            {user?.role}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2">
+                      <DropdownItem href="/profile" icon={User} label="My Profile" onClick={() => setDropdownOpen(false)} />
+                      <DropdownItem href={dashboardHref} icon={LayoutDashboard} label="Dashboard" onClick={() => setDropdownOpen(false)} />
+                      <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center">
+                          <LogOut className="w-4 h-4 text-red-500" />
+                        </div>
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
-              <div className="flex flex-col gap-2">
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-full border-indigo-200 dark:border-slate-600 text-indigo-600 dark:text-indigo-400"
-                  >
+              <div className="flex items-center gap-2">
+                <Link href="/login">
+                  <button className="px-5 py-2 rounded-xl text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200">
                     Login
-                  </Button>
+                  </button>
                 </Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-                    Register
-                  </Button>
+                <Link href="/register">
+                  <button className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200">
+                    Get Started
+                  </button>
                 </Link>
               </div>
             )}
           </div>
+
+          {/* ── Mobile Toggle ── */}
+          <button
+            className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors border border-indigo-100/60 dark:border-indigo-900/40"
+            onClick={() => setMobileOpen((m) => !m)}
+          >
+            {mobileOpen
+              ? <X className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              : <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />}
+          </button>
         </div>
+
+        {/* ── Mobile Menu ── */}
+        <div className={`lg:hidden transition-all duration-300 overflow-hidden ${mobileOpen ? "max-h-[600px]" : "max-h-0"}`}>
+          <div className="border-t border-indigo-100/60 dark:border-indigo-900/40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl px-4 py-4 space-y-1">
+
+            <MobileNavItem href="/" label="Home" icon={Home} onClick={() => setMobileOpen(false)} active={isActive("/")} />
+            <MobileNavItem href="/events" label="Events" icon={Calendar} onClick={() => setMobileOpen(false)} active={isActive("/events")} />
+
+            {/* Pages section */}
+            <div className="pt-2">
+              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-1">Pages</p>
+              {pages.map((p) => (
+                <MobileNavItem key={p.href} href={p.href} label={p.label} icon={p.icon} onClick={() => setMobileOpen(false)} active={isActive(p.href)} />
+              ))}
+            </div>
+
+            {isAuthenticated && (
+              <div className="pt-2 border-t border-indigo-100/60 dark:border-indigo-900/40">
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-1">Account</p>
+                <MobileNavItem href="/profile" label="My Profile" icon={User} onClick={() => setMobileOpen(false)} active={isActive("/profile")} />
+                <MobileNavItem href={dashboardHref} label="Dashboard" icon={LayoutDashboard} onClick={() => setMobileOpen(false)} active={isActive(dashboardHref)} />
+                <MobileNavItem href="/invitations" label="Invitations" icon={Mail} onClick={() => setMobileOpen(false)} active={isActive("/invitations")} />
+              </div>
+            )}
+
+            <div className="pt-2 border-t border-indigo-100/60 dark:border-indigo-900/40 flex items-center justify-between">
+              <ThemeToggle />
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <button className="px-4 py-2 rounded-xl text-sm font-semibold text-indigo-600 border border-indigo-200 dark:border-indigo-800">
+                      Login
+                    </button>
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)}>
+                    <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600">
+                      Register
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Spacer so content doesn't hide under fixed nav */}
+      <div className="h-[69px]" />
+    </>
+  );
+}
+
+/* ── Sub-components ── */
+
+function NavItem({
+  href, label, active, onClick,
+}: {
+  href: string; label: string; active: boolean; onClick: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`relative flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+        active
+          ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50"
+          : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/30"
+      }`}
+    >
+      {label}
+      {active && (
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-indigo-500 rounded-full" />
+      )}
+    </Link>
+  );
+}
+
+function MobileNavItem({
+  href, label, icon: Icon, onClick, active,
+}: {
+  href: string; label: string; icon: any; onClick: () => void; active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+        active
+          ? "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
+          : "text-slate-700 dark:text-slate-300 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/30 hover:text-indigo-600 dark:hover:text-indigo-400"
+      }`}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+        active
+          ? "bg-indigo-100 dark:bg-indigo-900/40"
+          : "bg-slate-100 dark:bg-slate-800"
+      }`}>
+        <Icon className="w-4 h-4" />
       </div>
-    </nav>
+      {label}
+    </Link>
+  );
+}
+
+function DropdownItem({
+  href, icon: Icon, label, onClick,
+}: {
+  href: string; icon: any; label: string; onClick: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
+    >
+      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+        <Icon className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+      </div>
+      <span className="font-medium">{label}</span>
+    </Link>
   );
 }
