@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/components/shared/Providers";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import ChatbotWrapper from "@/components/shared/ChatbotWrapper";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body className={geist.className}>
         <ThemeProvider>
           <Providers>
-            {children}
+            <ChatbotWrapper>
+              {children}
+            </ChatbotWrapper>
             <Toaster position="top-right" />
           </Providers>
         </ThemeProvider>

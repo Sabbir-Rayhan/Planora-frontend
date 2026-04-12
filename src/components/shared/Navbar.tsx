@@ -19,6 +19,8 @@ import {
   Ticket,
   Mail,
   ChevronDown,
+  BookOpen,
+  Users,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -27,15 +29,18 @@ export default function Navbar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pagesRef = useRef<HTMLDivElement>(null);
 
+  // Handle click outside for both dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (pagesRef.current && !pagesRef.current.contains(event.target as Node)) {
+        setPagesOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -71,6 +76,13 @@ export default function Navbar() {
     { href: "/events", label: "Events", icon: Calendar },
   ];
 
+  // Pages dropdown items
+  const pages = [
+    { href: "/about", label: "About Us", icon: Users, desc: "Learn about Planora" },
+    { href: "/contact", label: "Contact", icon: Mail, desc: "Get in touch with us" },
+    { href: "/blog", label: "Blog", icon: BookOpen, desc: "Tips and insights" },
+  ];
+
   const authenticatedNavLinks = [
     { href: "/events/my-events", label: "My Events", icon: Ticket },
     { href: "/invitations", label: "Invitations", icon: Mail },
@@ -99,6 +111,7 @@ export default function Navbar() {
       onClick={() => {
         setMobileOpen(false);
         setDropdownOpen(false);
+        setPagesOpen(false);
       }}
     >
       <Icon className="w-4 h-4" />
@@ -118,15 +131,50 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
-          {publicNavLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
-          ))}
+        <div className="hidden md:flex items-center gap-1">
+          <NavLink href="/" label="Home" icon={Home} />
+          <NavLink href="/events" label="Events" icon={Calendar} />
+
+          {/* Pages Dropdown */}
+          <div className="relative" ref={pagesRef}>
+            <button
+              onClick={() => setPagesOpen(!pagesOpen)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Pages</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${pagesOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {pagesOpen && (
+              <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-indigo-100 dark:border-slate-700 py-2 z-50">
+                {pages.map((page) => {
+                  const Icon = page.icon;
+                  return (
+                    <Link
+                      key={page.href}
+                      href={page.href}
+                      onClick={() => setPagesOpen(false)}
+                      className="flex items-start gap-3 px-4 py-3 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{page.label}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{page.desc}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {isAuthenticated && (
             <>
-              {authenticatedNavLinks.map((link) => (
-                <NavLink key={link.href} {...link} />
-              ))}
+              <NavLink href="/events/my-events" label="My Events" icon={Ticket} />
+              <NavLink href="/invitations" label="Invitations" icon={Mail} />
               {dashboardLink && <NavLink {...dashboardLink} />}
             </>
           )}
@@ -229,6 +277,22 @@ export default function Navbar() {
           {publicNavLinks.map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
+
+          {/* Pages Section in Mobile Menu */}
+          <div className="pt-2 border-t border-indigo-100 dark:border-slate-700">
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2 px-1">
+              Pages
+            </p>
+            {pages.map((page) => (
+              <NavLink
+                key={page.href}
+                href={page.href}
+                label={page.label}
+                icon={page.icon}
+              />
+            ))}
+          </div>
+
           {isAuthenticated && (
             <>
               {authenticatedNavLinks.map((link) => (
